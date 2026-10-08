@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Play,
   ArrowRight,
@@ -810,96 +811,17 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Interactive Live Mockup */}
+            {/* Right: Student Dashboard Image Showcase */}
             <div className="lg:col-span-7">
-              <div className="rounded-3xl border-4 border-charcoal-900 bg-charcoal-950 p-4 shadow-2xl">
-                {/* Simulated Portal Window */}
-                <div className="rounded-2xl bg-ivory-100 p-6 text-charcoal-900">
-                  <div className="flex items-center justify-between border-b border-charcoal-200 pb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-950 text-ivory-50 font-bold">
-                        A
-                      </div>
-                      <div>
-                        <p className="text-xs text-charcoal-500">Assalamu Alaikum,</p>
-                        <p className="font-serif text-base font-bold text-green-950">
-                          Ahmed Ali
-                        </p>
-                      </div>
-                    </div>
-                    <Badge variant="green">Grade 6 • Student</Badge>
-                  </div>
-
-                  {/* Mockup content: Progress + Upcoming Class */}
-                  <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {/* Progress Card */}
-                    <div className="rounded-xl border border-charcoal-200 bg-white p-4">
-                      <h4 className="text-xs font-bold uppercase text-charcoal-500">
-                        My Learning Progress
-                      </h4>
-                      <div className="mt-3 space-y-2.5">
-                        <div>
-                          <div className="flex justify-between text-xs font-medium">
-                            <span>Qur&apos;an Reading</span>
-                            <span className="text-green-800 font-bold">68%</span>
-                          </div>
-                          <div className="mt-1 h-2 w-full rounded-full bg-ivory-200">
-                            <div className="h-2 rounded-full bg-green-800 w-[68%]" />
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between text-xs font-medium">
-                            <span>Tajweed Rules</span>
-                            <span className="text-gold-600 font-bold">55%</span>
-                          </div>
-                          <div className="mt-1 h-2 w-full rounded-full bg-ivory-200">
-                            <div className="h-2 rounded-full bg-gold-500 w-[55%]" />
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between text-xs font-medium">
-                            <span>Seerah</span>
-                            <span className="text-green-800 font-bold">80%</span>
-                          </div>
-                          <div className="mt-1 h-2 w-full rounded-full bg-ivory-200">
-                            <div className="h-2 rounded-full bg-green-800 w-[80%]" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Upcoming Class */}
-                    <div className="rounded-xl border border-charcoal-200 bg-white p-4 flex flex-col justify-between">
-                      <div>
-                        <h4 className="text-xs font-bold uppercase text-charcoal-500">
-                          Upcoming Class
-                        </h4>
-                        <div className="mt-3 rounded-lg bg-green-50 p-3 border border-green-200">
-                          <p className="font-serif text-sm font-bold text-green-950">
-                            Qur&apos;an Recitation
-                          </p>
-                          <p className="text-xs text-charcoal-600 mt-0.5">
-                            Today • 5:00 PM (Dubai Time)
-                          </p>
-                          <p className="text-[11px] text-green-800 mt-1 font-medium">
-                            Teacher: Ustadh Ahmed Al-Misri
-                          </p>
-                        </div>
-                      </div>
-
-                      <a
-                        href="https://zoom.us"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-green-900 py-2.5 text-xs font-semibold text-white shadow-xs hover:bg-green-800 transition"
-                      >
-                        <Video className="h-3.5 w-3.5" /> Join Zoom Meeting
-                      </a>
-                    </div>
-                  </div>
-                </div>
+              <div className="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-charcoal-200/90 bg-white p-2 md:p-3 shadow-xl shadow-green-950/5 transition-all duration-300 hover:shadow-2xl hover:shadow-green-950/10">
+                <Image
+                  src="/images/young-muslim-student-dashboard.webp"
+                  alt="Young Muslim Student's Learning Dashboard - Al-Qalam Global Academy"
+                  width={1200}
+                  height={800}
+                  priority
+                  className="w-full h-auto rounded-xl md:rounded-2xl object-cover transition-transform duration-500 group-hover:scale-[1.01]"
+                />
               </div>
             </div>
           </div>
