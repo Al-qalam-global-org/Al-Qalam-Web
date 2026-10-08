@@ -106,18 +106,22 @@ export function Sidebar({ role, userName, userEmail }: SidebarProps) {
     <aside className="flex h-screen w-64 flex-col justify-between border-r border-charcoal-200 bg-white shadow-xs">
       <div>
         {/* Brand */}
-        <div className="flex h-16 items-center gap-3 border-b border-charcoal-200 px-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-green-950 text-gold-400">
-            <GraduationCap className="h-5 w-5" />
+        <div className="flex flex-col border-b border-charcoal-200 px-5 py-3">
+          <div className="flex items-center gap-2">
+            <img
+              src="/logos/logo-icon.jpeg"
+              alt="Al-Qalam"
+              className="h-8 w-auto object-contain mix-blend-multiply"
+            />
+            <img
+              src="/logos/logo-name.jpeg"
+              alt="Al-Qalam Global"
+              className="h-6 w-auto object-contain mix-blend-multiply"
+            />
           </div>
-          <div>
-            <span className="font-serif text-base font-bold text-green-950">
-              Al-Qalam<span className="text-gold-500">Global</span>
-            </span>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-charcoal-500">
-              {roleLabels[role]}
-            </p>
-          </div>
+          <p className="mt-1 text-[9px] font-semibold uppercase tracking-wider text-charcoal-500 pl-1">
+            {roleLabels[role]}
+          </p>
         </div>
 
         {/* Navigation Items */}

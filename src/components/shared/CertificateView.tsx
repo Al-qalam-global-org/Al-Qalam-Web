@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { GraduationCap, Award, Printer, CheckCircle2 } from "lucide-react";
+import { Award, Printer, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { BrandLogo } from "@/components/shared/BrandLogo";
 import { formatDate } from "@/lib/utils";
 
 export interface CertificateData {
@@ -54,15 +55,7 @@ export function CertificateView({ certificate }: { certificate: CertificateData 
         <div className="border-2 border-dashed border-gold-600/40 p-8 rounded-xl bg-white/60">
           {/* Academy Brand Header */}
           <div className="flex flex-col items-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-950 text-gold-400 shadow-md">
-              <GraduationCap className="h-9 w-9" />
-            </div>
-            <h1 className="mt-3 font-serif text-2xl font-bold tracking-wider text-green-950 uppercase">
-              Al-Qalam Global Academy
-            </h1>
-            <p className="text-xs uppercase tracking-[0.2em] text-gold-600 font-semibold">
-              Online Islamic Education Platform
-            </p>
+            <BrandLogo href={null} iconHeight="h-16" nameHeight="h-10" />
           </div>
 
           <div className="my-6">

@@ -16,6 +16,10 @@ import {
   Video,
   Quote,
   Star,
+  BookOpen,
+  GraduationCap,
+  Compass,
+  Users,
 } from "lucide-react";
 import { Navbar } from "@/components/shared/Navbar";
 import { Footer } from "@/components/shared/Footer";
@@ -42,8 +46,7 @@ export default function LandingPage() {
       "Structured online Islamic education for children, teenagers and adults — with qualified teachers, flexible learning and a clear path from knowledge to practice.",
     primaryCtaText: "Watch Free Course Preview",
     secondaryCtaText: "Explore Learning Paths",
-    heroImageUrl:
-      "https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=800&auto=format&fit=crop&q=80",
+    heroImageUrl: "",
     quoteBadgeText: "Read. Learn. Understand. Live.",
     captionTitle: "Empowering Homes With Sacred Knowledge",
     stats: [
@@ -54,30 +57,61 @@ export default function LandingPage() {
     ],
   });
 
-  const defaultTeachers = [
-    {
-      name: "Ustadh Ahmed",
-      specialization: "Qur'an and Tajweed",
-      experience: "12+ years experience",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80",
-    },
-    {
-      name: "Ustadh Faisal",
-      specialization: "Tafseer and Hadith",
-      experience: "10+ years experience",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80",
-    },
-    {
-      name: "Ustadh Hamza",
-      specialization: "Fiqh and Islamic Studies",
-      experience: "8+ years experience",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=80",
-    },
-  ];
-
-  const [teacherList, setTeacherList] = useState(defaultTeachers);
+  const [teacherList, setTeacherList] = useState<any[]>([]);
   const [teacherIndex, setTeacherIndex] = useState(0);
   const [isTeacherPaused, setIsTeacherPaused] = useState(false);
+  const [isLoadingTeachers, setIsLoadingTeachers] = useState(true);
+
+  // Real courses from backend database
+  const [coursesList, setCoursesList] = useState<any[]>([]);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+
+  // Real testimonials from backend CMS
+  const [testimonialsList, setTestimonialsList] = useState<any[]>([]);
+
+  // Real learning paths from backend CMS
+  const [learningPathsList, setLearningPathsList] = useState<any[]>([
+    {
+      id: "children",
+      title: "Children",
+      tag: "Grades 1 – 12",
+      description:
+        "Build a strong Islamic foundation with engaging and structured learning designed for young hearts and minds.",
+      image: "",
+      cta: "Explore Children's Program",
+      link: "/programs#children",
+    },
+    {
+      id: "teenagers",
+      title: "Teenagers",
+      tag: "Ages 13 – 18",
+      description:
+        "Develop Islamic identity, confidence and deep understanding for the modern world with relatable guidance.",
+      image: "",
+      cta: "Explore Teen Program",
+      link: "/programs#teenagers",
+    },
+    {
+      id: "adults",
+      title: "Adults and Professionals",
+      tag: "Flexible Schedules",
+      description:
+        "Strengthen your knowledge with flexible learning tailored around your career, busy routine, and family.",
+      image: "",
+      cta: "Explore Adult Learning",
+      link: "/programs#adults",
+    },
+    {
+      id: "lifelong",
+      title: "Lifelong Learners",
+      tag: "Any Age",
+      description:
+        "It is never too late to learn. Reconnect with the Qur'an and deepen your spiritual journey and understanding.",
+      image: "",
+      cta: "Explore Lifelong Learning",
+      link: "/programs#lifelong",
+    },
+  ]);
 
   React.useEffect(() => {
     async function fetchCmsHero() {
@@ -86,6 +120,18 @@ export default function LandingPage() {
         const json = await res.json();
         if (json.success && json.data) {
           setHero((prev) => ({ ...prev, ...json.data }));
+        }
+      } catch (err) {
+        // Safe empty / default
+      }
+    }
+
+    async function fetchCmsLearningPaths() {
+      try {
+        const res = await fetch("/api/cms?key=learning_paths");
+        const json = await res.json();
+        if (json.success && json.data?.paths && Array.isArray(json.data.paths)) {
+          setLearningPathsList(json.data.paths);
         }
       } catch (err) {
         // Safe fallback
@@ -101,17 +147,54 @@ export default function LandingPage() {
             name: `${t.firstName} ${t.lastName}`,
             specialization: t.specialization || "Islamic Studies & Quran",
             experience: t.experienceYears ? `${t.experienceYears}+ years experience` : "Certified Educator",
-            image: t.profileImage || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80",
+            image: t.profileImage || "",
           }));
           setTeacherList(mapped);
+        } else {
+          setTeacherList([]);
         }
       } catch (err) {
-        // Fallback to defaultTeachers
+        setTeacherList([]);
+      } finally {
+        setIsLoadingTeachers(false);
+      }
+    }
+
+    async function fetchLiveCourses() {
+      try {
+        const res = await fetch("/api/courses?take=10");
+        const json = await res.json();
+        if (json.success && json.data?.courses && json.data.courses.length > 0) {
+          setCoursesList(json.data.courses);
+        } else {
+          setCoursesList([]);
+        }
+      } catch (err) {
+        setCoursesList([]);
+      } finally {
+        setIsLoadingCourses(false);
+      }
+    }
+
+    async function fetchLiveTestimonials() {
+      try {
+        const res = await fetch("/api/cms/testimonials");
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          setTestimonialsList(json.data);
+        } else {
+          setTestimonialsList([]);
+        }
+      } catch (err) {
+        setTestimonialsList([]);
       }
     }
 
     fetchCmsHero();
+    fetchCmsLearningPaths();
     fetchLiveTeachers();
+    fetchLiveCourses();
+    fetchLiveTestimonials();
   }, []);
 
   // Auto-slide teacher carousel if more than 3 teachers exist
@@ -132,87 +215,12 @@ export default function LandingPage() {
     return items;
   }, [teacherList, teacherIndex]);
 
-  const learningPaths = [
-    {
-      id: "children",
-      title: "Children",
-      tag: "Grades 1 – 12",
-      description:
-        "Build a strong Islamic foundation with engaging and structured learning designed for young hearts and minds.",
-      image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&auto=format&fit=crop&q=80",
-      cta: "Explore Children's Program",
-    },
-    {
-      id: "teenagers",
-      title: "Teenagers",
-      tag: "Ages 13 – 18",
-      description:
-        "Develop Islamic identity, confidence and deep understanding for the modern world with relatable guidance.",
-      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&auto=format&fit=crop&q=80",
-      cta: "Explore Teen Program",
-    },
-    {
-      id: "adults",
-      title: "Adults and Professionals",
-      tag: "Flexible Schedules",
-      description:
-        "Strengthen your knowledge with flexible learning tailored around your career, busy routine, and family.",
-      image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&auto=format&fit=crop&q=80",
-      cta: "Explore Adult Learning",
-    },
-    {
-      id: "lifelong",
-      title: "Lifelong Learners",
-      tag: "Any Age",
-      description:
-        "It is never too late to learn. Reconnect with the Qur'an and deepen your spiritual journey and understanding.",
-      image: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80",
-      cta: "Explore Lifelong Learning",
-    },
-  ];
-
-  const courses = [
-    {
-      id: "madrassa",
-      name: "Online Madrassa",
-      levelTag: "Grades 1 – 12",
-      description:
-        "Complete Islamic education programme for students covering Aqeedah, Fiqh, Seerah, and Islamic manners.",
-      image: "https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=600&auto=format&fit=crop&q=80",
-    },
-    {
-      id: "quran",
-      name: "Qur'an Reading and Recitation",
-      levelTag: "All Levels",
-      description:
-        "Build a strong foundation with Tajweed and correct recitation under certified Ijazah holders.",
-      image: "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=600&auto=format&fit=crop&q=80",
-    },
-    {
-      id: "tafseer",
-      name: "Tafseer",
-      levelTag: "Understanding the Qur'an",
-      description:
-        "Discover the meanings, contextual background, and practical guidance from the verses of the Qur'an.",
-      image: "https://images.unsplash.com/photo-1564769625905-50e93615e769?w=600&auto=format&fit=crop&q=80",
-    },
-    {
-      id: "hadith",
-      name: "Hadith",
-      levelTag: "Prophetic Guidance",
-      description:
-        "Learn from the authentic teachings, actions, and noble character of Prophet Muhammad (ﷺ).",
-      image: "https://images.unsplash.com/photo-1542816417-0983c9c9ad53?w=600&auto=format&fit=crop&q=80",
-    },
-    {
-      id: "fiqh",
-      name: "Fiqh",
-      levelTag: "Islamic Practice",
-      description:
-        "Understand essential rulings for daily prayer, purification, fasting, and everyday ethics.",
-      image: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=600&auto=format&fit=crop&q=80",
-    },
-  ];
+  const PATH_ICONS: Record<string, any> = {
+    children: GraduationCap,
+    teenagers: Compass,
+    adults: Clock,
+    lifelong: BookOpen,
+  };
 
   const steps = [
     {
@@ -245,85 +253,32 @@ export default function LandingPage() {
     },
   ];
 
-
-
-  const testimonials = [
-    {
-      id: "t1",
-      name: "Aisha M.",
-      initials: "AM",
-      role: "Parent of 2 Students",
-      location: "Dubai, UAE",
-      rating: 5,
-      program: "Online Madrassa & Tajweed",
-      quote:
-        "Al Qalam Global has been a true blessing for our family. My children look forward to every class. Their Qur'an reading and tajweed have improved remarkably, and the Ustadh is exceptionally patient and encouraging.",
-    },
-    {
-      id: "t2",
-      name: "Rehman K.",
-      initials: "RK",
-      role: "Parent",
-      location: "Melbourne, Australia",
-      rating: 5,
-      program: "Children's Islamic Studies",
-      quote:
-        "Finding authentic, structured Islamic education outside Muslim-majority countries was always difficult for us until we joined Al Qalam. The syllabus is well-structured, clear, and easy to follow from home.",
-    },
-    {
-      id: "t3",
-      name: "Sami J.",
-      initials: "SJ",
-      role: "Adult Learner & Professional",
-      location: "Bengaluru, India",
-      rating: 5,
-      program: "Tafseer & Hadith Program",
-      quote:
-        "As a busy working professional, the flexible 1-to-1 scheduling makes it possible to continue my lifelong learning. The Tafseer sessions have given me a far deeper connection with the Qur'an and daily practice.",
-    },
-    {
-      id: "t4",
-      name: "Fatima & Omar",
-      initials: "FO",
-      role: "Parents",
-      location: "London, UK",
-      rating: 5,
-      program: "Qur'an Recitation & Seerah",
-      quote:
-        "The personalized attention and regular feedback on the student portal give us complete peace of mind. Our daughter has gained tremendous confidence in reciting and understanding the Sunnah.",
-    },
-    {
-      id: "t5",
-      name: "Dr. Tariq N.",
-      initials: "TN",
-      role: "Parent",
-      location: "Riyadh, Saudi Arabia",
-      rating: 5,
-      program: "Advanced Tajweed Track",
-      quote:
-        "The teachers are certified scholars who genuinely care about the moral character and spiritual growth of the students, not just academic memorization. Highly recommended to any family.",
-    },
-  ];
-
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [isTestimonialPaused, setIsTestimonialPaused] = useState(false);
 
   React.useEffect(() => {
-    if (isTestimonialPaused) return;
+    if (isTestimonialPaused || testimonialsList.length <= 1) return;
     const timer = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
+      setActiveTestimonial((prev) => (prev + 1) % testimonialsList.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, [isTestimonialPaused, testimonials.length]);
+  }, [isTestimonialPaused, testimonialsList.length]);
 
   const visibleTestimonials = React.useMemo(() => {
-    const total = testimonials.length;
+    const total = testimonialsList.length;
+    if (total === 0) return [];
+    if (total <= 3) {
+      return testimonialsList.map((item, idx) => ({
+        ...item,
+        position: idx === activeTestimonial % total ? "center" : "prev",
+      }));
+    }
     return [
-      { ...testimonials[(activeTestimonial - 1 + total) % total], position: "prev" },
-      { ...testimonials[activeTestimonial % total], position: "center" },
-      { ...testimonials[(activeTestimonial + 1) % total], position: "next" },
+      { ...testimonialsList[(activeTestimonial - 1 + total) % total], position: "prev" },
+      { ...testimonialsList[activeTestimonial % total], position: "center" },
+      { ...testimonialsList[(activeTestimonial + 1) % total], position: "next" },
     ];
-  }, [activeTestimonial, testimonials]);
+  }, [activeTestimonial, testimonialsList]);
 
   return (
     <div className="flex min-h-screen flex-col bg-ivory-100">
@@ -400,12 +355,16 @@ export default function LandingPage() {
 
             {/* Right Hero Image */}
             <div className="relative lg:col-span-5 flex">
-              <div className="relative w-full h-full min-h-[320px] overflow-hidden rounded-2xl shadow-lg">
-                <img
-                  src={hero.heroImageUrl}
-                  alt="Islamic Quran Education at Al Qalam"
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
+              <div className="relative w-full h-full min-h-[320px] overflow-hidden rounded-2xl shadow-lg bg-green-950/10">
+                {hero.heroImageUrl ? (
+                  <img
+                    src={hero.heroImageUrl}
+                    alt="Islamic Quran Education at Al Qalam"
+                    className="absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-950/15 via-gold-500/10 to-charcoal-200 animate-pulse" />
+                )}
               </div>
             </div>
           </div>
@@ -442,43 +401,58 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {learningPaths.map((path) => (
-              <div
-                key={path.id}
-                className="group flex flex-col justify-between rounded-2xl border border-charcoal-200 bg-ivory-50/50 p-4 transition-all duration-200 hover:-translate-y-1 hover:border-green-700/30 hover:shadow-lift"
-              >
-                <div>
-                  <div className="relative h-44 overflow-hidden rounded-xl">
-                    <img
-                      src={path.image}
-                      alt={path.title}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute top-3 left-3">
-                      <span className="rounded-lg bg-green-950/80 px-2.5 py-1 text-[11px] font-semibold text-gold-400 backdrop-blur-xs">
-                        {path.tag}
-                      </span>
+            {learningPathsList.map((path) => {
+              const PathIcon = PATH_ICONS[path.id] || BookOpen;
+              return (
+                <div
+                  key={path.id}
+                  className="group flex flex-col justify-between rounded-2xl border border-charcoal-200 bg-ivory-50/50 p-4 transition-all duration-200 hover:-translate-y-1 hover:border-green-700/30 hover:shadow-lift"
+                >
+                  <div>
+                    <div className="relative h-44 overflow-hidden rounded-xl bg-gradient-to-br from-green-950 via-green-900 to-charcoal-900 p-5 flex flex-col justify-between shadow-xs">
+                      {path.image ? (
+                        <>
+                          <img
+                            src={path.image}
+                            alt={path.title}
+                            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-green-950 via-green-950/65 to-black/35" />
+                        </>
+                      ) : null}
+                      <div className="relative z-10 flex items-center justify-between">
+                        <span className="rounded-lg bg-gold-500/20 px-2.5 py-1 text-[11px] font-semibold text-gold-300 border border-gold-400/40 backdrop-blur-xs">
+                          {path.tag}
+                        </span>
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-gold-300 backdrop-blur-xs shadow-xs">
+                          <PathIcon className="h-5 w-5" />
+                        </div>
+                      </div>
+                      <div className="relative z-10">
+                        <span className="text-[10px] font-mono tracking-wider text-gold-400/90 uppercase">Pathway Track</span>
+                        <p className="font-serif text-lg font-bold text-white drop-shadow-xs">{path.title}</p>
+                      </div>
                     </div>
+
+                    <h3 className="mt-4 font-serif text-xl font-bold text-green-950">
+                      {path.title}
+                    </h3>
+                    <p className="mt-2 text-xs text-charcoal-600 leading-relaxed">
+                      {path.description}
+                    </p>
                   </div>
 
-                  <h3 className="mt-4 font-serif text-xl font-bold text-green-950">
-                    {path.title}
-                  </h3>
-                  <p className="mt-2 text-xs text-charcoal-600 leading-relaxed">
-                    {path.description}
-                  </p>
+                  <div className="mt-6 pt-3 border-t border-charcoal-200/60">
+                    <Link
+                      href={path.link || "/programs"}
+                      className="inline-flex items-center text-xs font-bold text-green-900 hover:text-gold-600 transition gap-1"
+                    >
+                      {path.cta || "Explore Program"} <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
                 </div>
-
-                <div className="mt-6 pt-3 border-t border-charcoal-200/60">
-                  <Link
-                    href="/programs"
-                    className="inline-flex items-center text-xs font-bold text-green-900 hover:text-gold-600 transition gap-1"
-                  >
-                    {path.cta} <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -523,18 +497,64 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-            {courses.map((course) => (
-              <div
-                key={course.id}
-                className="group flex flex-col justify-between rounded-2xl border border-green-800/80 bg-green-900/60 p-4 transition-all duration-200 hover:-translate-y-1 hover:border-gold-500/50 hover:bg-green-900/90"
-              >
-                <div>
-                  <div className="relative h-40 overflow-hidden rounded-xl">
-                    <img
-                      src={course.image}
-                      alt={course.name}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 opacity-90"
-                    />
+            {isLoadingCourses ? (
+              [...Array(5)].map((_, i) => (
+                <div key={i} className="h-64 rounded-2xl bg-green-900/40 animate-pulse border border-green-800/40" />
+              ))
+            ) : coursesList.length === 0 ? (
+              <div className="col-span-full rounded-2xl border border-dashed border-green-800 bg-green-900/30 p-10 text-center">
+                <BookOpen className="mx-auto h-10 w-10 text-gold-400/70 mb-3" />
+                <p className="font-serif text-lg font-bold text-white">No courses published yet</p>
+                <p className="text-xs text-charcoal-300 mt-1">Our curriculum is being updated. Explore our programs or contact admissions.</p>
+              </div>
+            ) : (
+              coursesList.map((course) => (
+                <div
+                  key={course.id}
+                  className="group flex flex-col justify-between rounded-2xl border border-green-800/80 bg-green-900/60 p-4 transition-all duration-200 hover:-translate-y-1 hover:border-gold-500/50 hover:bg-green-900/90"
+                >
+                  <div>
+                    <div className="relative h-40 overflow-hidden rounded-xl bg-green-900 flex items-center justify-center">
+                      {course.imageUrl ? (
+                        <img
+                          src={course.imageUrl}
+                          alt={course.name}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 opacity-90"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center p-4 text-center">
+                          <BookOpen className="h-8 w-8 text-gold-400 mb-1" />
+                          <span className="text-[11px] font-serif font-bold text-white line-clamp-1">{course.name}</span>
+                        </div>
+                      )}
+                      <button
+                        onClick={() =>
+                          setActivePreview({
+                            title: course.name,
+                            description: course.description,
+                          })
+                        }
+                        className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/20 transition"
+                        aria-label={`Watch preview of ${course.name}`}
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-green-950 shadow-lg group-hover:scale-110 transition">
+                          <Play className="h-4 w-4 fill-current ml-0.5" />
+                        </div>
+                      </button>
+                    </div>
+
+                    <h3 className="mt-4 font-serif text-lg font-bold text-white">
+                      {course.name}
+                    </h3>
+                    <p className="text-[11px] font-medium text-gold-400">
+                      {course.category || course.level || "Foundation"}
+                    </p>
+                    <p className="mt-2 text-xs text-charcoal-300 leading-relaxed line-clamp-3">
+                      {course.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-5 pt-3 border-t border-green-800">
                     <button
                       onClick={() =>
                         setActivePreview({
@@ -542,41 +562,14 @@ export default function LandingPage() {
                           description: course.description,
                         })
                       }
-                      className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/20 transition"
-                      aria-label={`Watch preview of ${course.name}`}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-950/80 py-2 text-xs font-semibold text-gold-400 hover:bg-green-950 hover:text-gold-300 transition"
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-green-950 shadow-lg group-hover:scale-110 transition">
-                        <Play className="h-4 w-4 fill-current ml-0.5" />
-                      </div>
+                      <Play className="h-3 w-3 fill-current" /> Watch Preview
                     </button>
                   </div>
-
-                  <h3 className="mt-4 font-serif text-lg font-bold text-white">
-                    {course.name}
-                  </h3>
-                  <p className="text-[11px] font-medium text-gold-400">
-                    {course.levelTag}
-                  </p>
-                  <p className="mt-2 text-xs text-charcoal-300 leading-relaxed">
-                    {course.description}
-                  </p>
                 </div>
-
-                <div className="mt-5 pt-3 border-t border-green-800">
-                  <button
-                    onClick={() =>
-                      setActivePreview({
-                        title: course.name,
-                        description: course.description,
-                      })
-                    }
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-950/80 py-2 text-xs font-semibold text-gold-400 hover:bg-green-950 hover:text-gold-300 transition"
-                  >
-                    <Play className="h-3 w-3 fill-current" /> Watch Preview
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -721,30 +714,47 @@ export default function LandingPage() {
 
               {/* 3-card display with smooth transition */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                {visibleTeachers.map((t, idx) => (
-                  <div
-                    key={`${t.name}-${idx}`}
-                    className="group rounded-2xl border border-charcoal-200/80 bg-ivory-50 p-4 text-center shadow-xs hover:shadow-card hover:-translate-y-1 transition-all duration-300"
-                  >
-                    <div className="relative inline-block mx-auto">
-                      <img
-                        src={t.image}
-                        alt={t.name}
-                        className="mx-auto h-24 w-24 rounded-full object-cover border-2 border-gold-500/40 group-hover:border-gold-500 transition"
-                      />
-                      <span className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-green-600 border-2 border-white shadow-xs" title="Active Educator" />
-                    </div>
-                    <h4 className="mt-3 font-serif text-base font-bold text-green-950 group-hover:text-green-900 transition">
-                      {t.name}
-                    </h4>
-                    <p className="text-xs font-semibold text-green-800 mt-0.5">
-                      {t.specialization}
-                    </p>
-                    <p className="text-[11px] text-charcoal-500 mt-1">
-                      {t.experience}
-                    </p>
+                {isLoadingTeachers ? (
+                  [...Array(3)].map((_, i) => (
+                    <div key={i} className="h-48 rounded-2xl bg-ivory-200/50 animate-pulse border border-charcoal-200" />
+                  ))
+                ) : teacherList.length === 0 ? (
+                  <div className="col-span-full rounded-2xl border border-dashed border-charcoal-300 bg-white/60 p-8 text-center sm:col-span-3">
+                    <p className="text-sm font-medium text-charcoal-600">No certified teachers listed currently.</p>
+                    <p className="text-xs text-charcoal-400 mt-1">Educator profiles will appear once active.</p>
                   </div>
-                ))}
+                ) : (
+                  visibleTeachers.map((t, idx) => (
+                    <div
+                      key={`${t.name}-${idx}`}
+                      className="group rounded-2xl border border-charcoal-200/80 bg-ivory-50 p-4 text-center shadow-xs hover:shadow-card hover:-translate-y-1 transition-all duration-300"
+                    >
+                      <div className="relative inline-block mx-auto">
+                        {t.image ? (
+                          <img
+                            src={t.image}
+                            alt={t.name}
+                            className="mx-auto h-24 w-24 rounded-full object-cover border-2 border-gold-500/40 group-hover:border-gold-500 transition"
+                          />
+                        ) : (
+                          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-green-950 font-serif text-2xl font-bold text-gold-400 border-2 border-gold-500/40 shadow-xs">
+                            {t.name ? t.name.charAt(0) : "U"}
+                          </div>
+                        )}
+                        <span className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-green-600 border-2 border-white shadow-xs" title="Active Educator" />
+                      </div>
+                      <h4 className="mt-3 font-serif text-base font-bold text-green-950 group-hover:text-green-900 transition">
+                        {t.name}
+                      </h4>
+                      <p className="text-xs font-semibold text-green-800 mt-0.5">
+                        {t.specialization}
+                      </p>
+                      <p className="text-[11px] text-charcoal-500 mt-1">
+                        {t.experience}
+                      </p>
+                    </div>
+                  ))
+                )}
               </div>
 
               {/* Carousel Indicator Dots when more than 3 teachers */}
@@ -829,179 +839,185 @@ export default function LandingPage() {
       </section>
 
       {/* 7. REAL STORIES & PARENTS TESTIMONIALS */}
-      <section className="bg-white py-16 md:py-24 border-b border-charcoal-200 overflow-hidden">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 items-center">
-            {/* Left: Testimonials Introduction & Rating Score */}
-            <div className="lg:col-span-4">
-              <span className="eyebrow">TESTIMONIALS</span>
-              <h2 className="mt-2 font-serif text-3xl font-bold text-green-950 sm:text-4xl leading-tight">
-                What the Parents <br className="hidden sm:inline" />
-                Have To Say
-              </h2>
-              <p className="mt-4 text-xs sm:text-sm text-charcoal-600 leading-relaxed">
-                At the heart of every student&apos;s growth is the support and trust of their parents. We take immense pride in hearing from families who have experienced the positive impact of our online Islamic education.
-              </p>
+      {testimonialsList.length > 0 && (
+        <section className="bg-white py-16 md:py-24 border-b border-charcoal-200 overflow-hidden">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 items-center">
+              {/* Left: Testimonials Introduction & Rating Score */}
+              <div className="lg:col-span-4">
+                <span className="eyebrow">TESTIMONIALS</span>
+                <h2 className="mt-2 font-serif text-3xl font-bold text-green-950 sm:text-4xl leading-tight">
+                  What the Parents <br className="hidden sm:inline" />
+                  Have To Say
+                </h2>
+                <p className="mt-4 text-xs sm:text-sm text-charcoal-600 leading-relaxed">
+                  At the heart of every student&apos;s growth is the support and trust of their parents. We take immense pride in hearing from families who have experienced the positive impact of our online Islamic education.
+                </p>
 
-              {/* Overall Satisfaction Badge */}
-              <div className="mt-6 rounded-2xl bg-ivory-50 border border-charcoal-200/80 p-3.5 inline-flex items-center gap-3.5">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-950 text-gold-400 font-serif font-bold text-base shadow-sm">
-                  4.9
-                </div>
-                <div>
-                  <div className="flex items-center gap-0.5 text-gold-500">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-3.5 w-3.5 fill-current" />
-                    ))}
+                {/* Overall Satisfaction Badge */}
+                <div className="mt-6 rounded-2xl bg-ivory-50 border border-charcoal-200/80 p-3.5 inline-flex items-center gap-3.5">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-950 text-gold-400 font-serif font-bold text-base shadow-sm">
+                    4.9
                   </div>
-                  <p className="text-[11px] font-semibold text-green-950 mt-0.5">
-                    500+ Happy Families Across 15+ Countries
-                  </p>
+                  <div>
+                    <div className="flex items-center gap-0.5 text-gold-500">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="h-3.5 w-3.5 fill-current" />
+                      ))}
+                    </div>
+                    <p className="text-[11px] font-semibold text-green-950 mt-0.5">
+                      Verified Reviews From Al Qalam Families
+                    </p>
+                  </div>
+                </div>
+
+                {/* CTA Action */}
+                <div className="mt-8 flex items-center gap-4">
+                  <Link href="/contact">
+                    <Button variant="primary" className="rounded-full gap-2 shadow-md text-xs">
+                      Book Free Demo Class <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
                 </div>
               </div>
 
-              {/* CTA Action */}
-              <div className="mt-8 flex items-center gap-4">
-                <Link href="/contact">
-                  <Button variant="primary" className="rounded-full gap-2 shadow-md text-xs">
-                    Book Free Demo Class <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
+              {/* Right: Reviews Display */}
+              <div
+                className="lg:col-span-8 flex flex-col justify-center"
+                onMouseEnter={() => setIsTestimonialPaused(true)}
+                onMouseLeave={() => setIsTestimonialPaused(false)}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 items-center">
+                  {visibleTestimonials.map((item, idx) => {
+                    const isCenter = item.position === "center";
+                    const isPrev = item.position === "prev";
+                    const isNext = item.position === "next";
 
-            {/* Right: 3 Reviews Display (Center Active + Translucent Prev & Next) */}
-            <div
-              className="lg:col-span-8 flex flex-col justify-center"
-              onMouseEnter={() => setIsTestimonialPaused(true)}
-              onMouseLeave={() => setIsTestimonialPaused(false)}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 items-center">
-                {visibleTestimonials.map((item, idx) => {
-                  const isCenter = item.position === "center";
-                  const isPrev = item.position === "prev";
-                  const isNext = item.position === "next";
-
-                  return (
-                    <div
-                      key={`${item.id}-${activeTestimonial}-${idx}`}
-                      onClick={() => {
-                        if (isPrev) {
-                          setActiveTestimonial((prev) =>
-                            prev === 0 ? testimonials.length - 1 : prev - 1
-                          );
-                        } else if (isNext) {
-                          setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-                        }
-                      }}
-                      className={`relative flex flex-col justify-between rounded-3xl p-5 sm:p-6 transition-all duration-500 ${
-                        isCenter
-                          ? "bg-white border-2 border-gold-500 shadow-2xl shadow-green-950/10 scale-100 md:scale-105 z-10 opacity-100 ring-4 ring-gold-500/15"
-                          : "bg-ivory-50/80 border border-charcoal-200/80 shadow-xs opacity-40 hover:opacity-75 scale-95 cursor-pointer hidden md:flex"
-                      }`}
-                      style={{ minHeight: isCenter ? "320px" : "290px" }}
-                    >
-                      <div>
-                        {/* Top: 5 Stars Rating & Program Tag */}
-                        <div className="flex items-center justify-between gap-2 mb-3.5">
-                          <div className="flex items-center gap-0.5 text-gold-500">
-                            {[...Array(item.rating)].map((_, i) => (
-                              <Star key={i} className="h-3.5 w-3.5 fill-current" />
-                            ))}
+                    return (
+                      <div
+                        key={`${item.id || idx}-${activeTestimonial}-${idx}`}
+                        onClick={() => {
+                          if (isPrev) {
+                            setActiveTestimonial((prev) =>
+                              prev === 0 ? testimonialsList.length - 1 : prev - 1
+                            );
+                          } else if (isNext) {
+                            setActiveTestimonial((prev) => (prev + 1) % testimonialsList.length);
+                          }
+                        }}
+                        className={`relative flex flex-col justify-between rounded-3xl p-5 sm:p-6 transition-all duration-500 ${
+                          isCenter
+                            ? "bg-white border-2 border-gold-500 shadow-2xl shadow-green-950/10 scale-100 md:scale-105 z-10 opacity-100 ring-4 ring-gold-500/15"
+                            : "bg-ivory-50/80 border border-charcoal-200/80 shadow-xs opacity-40 hover:opacity-75 scale-95 cursor-pointer hidden md:flex"
+                        }`}
+                        style={{ minHeight: isCenter ? "320px" : "290px" }}
+                      >
+                        <div>
+                          {/* Top: 5 Stars Rating & Program Tag */}
+                          <div className="flex items-center justify-between gap-2 mb-3.5">
+                            <div className="flex items-center gap-0.5 text-gold-500">
+                              {[...Array(item.rating || 5)].map((_, i) => (
+                                <Star key={i} className="h-3.5 w-3.5 fill-current" />
+                              ))}
+                            </div>
+                            {(item.program || item.courseName) && (
+                              <span
+                                className={`rounded-full px-2 py-0.5 text-[9px] font-bold border ${
+                                  isCenter
+                                    ? "bg-gold-100/90 text-gold-800 border-gold-300/60"
+                                    : "bg-charcoal-100 text-charcoal-600 border-charcoal-200"
+                                }`}
+                              >
+                                {item.program || item.courseName}
+                              </span>
+                            )}
                           </div>
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-[9px] font-bold border ${
-                              isCenter
-                                ? "bg-gold-100/90 text-gold-800 border-gold-300/60"
-                                : "bg-charcoal-100 text-charcoal-600 border-charcoal-200"
+
+                          {/* Quote Text */}
+                          <p
+                            className={`text-xs leading-relaxed italic ${
+                              isCenter ? "text-charcoal-800 font-medium" : "text-charcoal-600"
                             }`}
                           >
-                            {item.program}
-                          </span>
-                        </div>
-
-                        {/* Quote Text */}
-                        <p
-                          className={`text-xs leading-relaxed italic ${
-                            isCenter ? "text-charcoal-800 font-medium" : "text-charcoal-600"
-                          }`}
-                        >
-                          &ldquo;{item.quote}&rdquo;
-                        </p>
-                      </div>
-
-                      {/* Bottom Author Info (No photo, privacy-focused initial badge) */}
-                      <div className="mt-5 pt-3.5 border-t border-charcoal-200/60 flex items-center gap-2.5">
-                        <div
-                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-serif font-bold text-xs shadow-xs ${
-                            isCenter
-                              ? "bg-green-950 text-gold-400"
-                              : "bg-charcoal-200 text-charcoal-700"
-                          }`}
-                        >
-                          {item.initials}
-                        </div>
-                        <div className="overflow-hidden">
-                          <h4 className="font-serif text-xs font-bold text-green-950 truncate">
-                            {item.name}
-                          </h4>
-                          <p className="text-[10px] text-charcoal-500 truncate">
-                            {item.role} • {item.location}
+                            &ldquo;{item.quote || item.content}&rdquo;
                           </p>
                         </div>
+
+                        {/* Bottom Author Info */}
+                        <div className="mt-5 pt-3.5 border-t border-charcoal-200/60 flex items-center gap-2.5">
+                          <div
+                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-serif font-bold text-xs shadow-xs ${
+                              isCenter
+                                ? "bg-green-950 text-gold-400"
+                                : "bg-charcoal-200 text-charcoal-700"
+                            }`}
+                          >
+                            {item.initials || item.name?.charAt(0) || "P"}
+                          </div>
+                          <div className="overflow-hidden">
+                            <h4 className="font-serif text-xs font-bold text-green-950 truncate">
+                              {item.name}
+                            </h4>
+                            <p className="text-[10px] text-charcoal-500 truncate">
+                              {item.role || "Parent"}{item.location ? ` • ${item.location}` : ""}
+                            </p>
+                          </div>
+                        </div>
                       </div>
+                    );
+                  })}
+                </div>
+
+                {/* Progress & Navigation Bar Below Cards */}
+                {testimonialsList.length > 1 && (
+                  <div className="mt-6 flex items-center justify-between pt-2">
+                    <div className="flex items-center gap-2">
+                      {testimonialsList.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setActiveTestimonial(i)}
+                          aria-label={`Go to testimonial ${i + 1}`}
+                          className={`h-1.5 rounded-full transition-all duration-300 ${
+                            activeTestimonial === i
+                              ? "w-8 bg-gold-500"
+                              : "w-2 bg-charcoal-300 hover:bg-charcoal-400"
+                          }`}
+                        />
+                      ))}
+                      <span className="text-[11px] text-charcoal-400 ml-2 font-mono">
+                        0{activeTestimonial + 1} / 0{testimonialsList.length}
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
 
-              {/* Progress & Navigation Bar Below Cards */}
-              <div className="mt-6 flex items-center justify-between pt-2">
-                <div className="flex items-center gap-2">
-                  {testimonials.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setActiveTestimonial(i)}
-                      aria-label={`Go to testimonial ${i + 1}`}
-                      className={`h-1.5 rounded-full transition-all duration-300 ${
-                        activeTestimonial === i
-                          ? "w-8 bg-gold-500"
-                          : "w-2 bg-charcoal-300 hover:bg-charcoal-400"
-                      }`}
-                    />
-                  ))}
-                  <span className="text-[11px] text-charcoal-400 ml-2 font-mono">
-                    0{activeTestimonial + 1} / 0{testimonials.length}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() =>
-                      setActiveTestimonial((prev) =>
-                        prev === 0 ? testimonials.length - 1 : prev - 1
-                      )
-                    }
-                    aria-label="Previous testimonial"
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-charcoal-200 bg-white text-charcoal-700 hover:border-gold-500 hover:text-gold-600 transition shadow-xs"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() =>
-                      setActiveTestimonial((prev) => (prev + 1) % testimonials.length)
-                    }
-                    aria-label="Next testimonial"
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-charcoal-200 bg-white text-charcoal-700 hover:border-gold-500 hover:text-gold-600 transition shadow-xs"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() =>
+                          setActiveTestimonial((prev) =>
+                            prev === 0 ? testimonialsList.length - 1 : prev - 1
+                          )
+                        }
+                        aria-label="Previous testimonial"
+                        className="flex h-8 w-8 items-center justify-center rounded-full border border-charcoal-200 bg-white text-charcoal-700 hover:border-gold-500 hover:text-gold-600 transition shadow-xs"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          setActiveTestimonial((prev) => (prev + 1) % testimonialsList.length)
+                        }
+                        aria-label="Next testimonial"
+                        className="flex h-8 w-8 items-center justify-center rounded-full border border-charcoal-200 bg-white text-charcoal-700 hover:border-gold-500 hover:text-gold-600 transition shadow-xs"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 8. FINAL CALL TO ACTION BANNER */}
       <section className="bg-gradient-to-b from-green-950 to-charcoal-900 py-16 md:py-24 text-center text-ivory-50">

@@ -84,6 +84,7 @@ async function main() {
       experienceYears: 12,
       specialization: "Qur'an & Tajweed, Tafseer",
       bio: "Over 12 years of experience teaching Qur'an recitation with authentic Tajweed rules across communities in Australia and the UAE.",
+      profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
       status: "ACTIVE",
     },
   });
@@ -109,6 +110,7 @@ async function main() {
       experienceYears: 10,
       specialization: "Tafseer & Hadith, Fiqh",
       bio: "Dedicated scholar focusing on contextual Islamic jurisprudence and Prophetic traditions for modern youth and families.",
+      profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80",
       status: "ACTIVE",
     },
   });
@@ -125,6 +127,7 @@ async function main() {
       ageGroup: "Children (Grades 1-12)",
       level: "All Levels",
       duration: "1 Year / Multi-term",
+      imageUrl: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80",
     },
     {
       name: "Qur'an Reading & Recitation",
@@ -135,6 +138,7 @@ async function main() {
       ageGroup: "All Ages",
       level: "Beginner to Advanced",
       duration: "6 Months",
+      imageUrl: "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&fit=crop&w=800&q=80",
     },
     {
       name: "Tafseer: Understanding the Qur'an",
@@ -145,6 +149,7 @@ async function main() {
       ageGroup: "Teens & Adults",
       level: "Intermediate",
       duration: "4 Months",
+      imageUrl: "https://images.unsplash.com/photo-1585036156171-384164a8c675?auto=format&fit=crop&w=800&q=80",
     },
     {
       name: "Hadith: Prophetic Guidance",
@@ -155,6 +160,7 @@ async function main() {
       ageGroup: "Teens & Adults",
       level: "Intermediate",
       duration: "3 Months",
+      imageUrl: "https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=800&q=80",
     },
     {
       name: "Fiqh: Islamic Practice & Law",
@@ -165,6 +171,7 @@ async function main() {
       ageGroup: "All Ages",
       level: "Beginner to Intermediate",
       duration: "4 Months",
+      imageUrl: "https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=800&q=80",
     },
     {
       name: "Akhlaq: Character & Etiquette",
@@ -175,6 +182,7 @@ async function main() {
       ageGroup: "Children & Teens",
       level: "Beginner",
       duration: "3 Months",
+      imageUrl: "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&w=800&q=80",
     },
     {
       name: "Seerah: The Prophet's Life",
@@ -185,6 +193,7 @@ async function main() {
       ageGroup: "All Ages",
       level: "All Levels",
       duration: "4 Months",
+      imageUrl: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=800&q=80",
     },
     {
       name: "Tarikh: Islamic History & Civilization",
@@ -195,6 +204,7 @@ async function main() {
       ageGroup: "Teens & Adults",
       level: "Intermediate",
       duration: "3 Months",
+      imageUrl: "https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=800&q=80",
     },
   ];
 
@@ -505,7 +515,91 @@ async function main() {
     },
   });
 
-  console.log("\n==========================================");
+  // 13. CMS SECTIONS
+  await prisma.cmsSection.upsert({
+    where: { key: "learning_paths" },
+    create: {
+      key: "learning_paths",
+      page: "HOME",
+      sectionName: "Learning for Every Generation",
+      content: {
+        sectionTitle: "Find the Right Learning Path for You",
+        sectionSubtitle: "Structured, age-appropriate programmes designed for every stage of life.",
+        paths: [
+          {
+            id: "children",
+            title: "Children",
+            tag: "Grades 1 – 12",
+            description:
+              "Build a strong Islamic foundation with engaging and structured learning designed for young hearts and minds.",
+            image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80",
+            cta: "Explore Children's Program",
+            link: "/programs#children",
+          },
+          {
+            id: "teenagers",
+            title: "Teenagers",
+            tag: "Ages 13 – 18",
+            description:
+              "Develop Islamic identity, confidence and deep understanding for the modern world with relatable guidance.",
+            image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80",
+            cta: "Explore Teen Program",
+            link: "/programs#teenagers",
+          },
+          {
+            id: "adults",
+            title: "Adults and Professionals",
+            tag: "Flexible Schedules",
+            description:
+              "Strengthen your knowledge with flexible learning tailored around your career, busy routine, and family.",
+            image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80",
+            cta: "Explore Adult Learning",
+            link: "/programs#adults",
+          },
+          {
+            id: "lifelong",
+            title: "Lifelong Learners",
+            tag: "Any Age",
+            description:
+              "It is never too late to learn. Reconnect with the Qur'an and deepen your spiritual journey and understanding.",
+            image: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80",
+            cta: "Explore Lifelong Learning",
+            link: "/programs#lifelong",
+          },
+        ],
+      },
+    },
+    update: {},
+  });
+
+  await prisma.cmsSection.upsert({
+    where: { key: "home_hero" },
+    create: {
+      key: "home_hero",
+      page: "HOME",
+      sectionName: "Hero & Banner Section",
+      content: {
+        eyebrow: "ISLAMIC EDUCATION FOR EVERY GENERATION",
+        headline: "Learn Islam. Live with Purpose.",
+        subheadline:
+          "Structured online Islamic education for children, teenagers and adults — with qualified teachers, flexible learning and a clear path from knowledge to practice.",
+        primaryCtaText: "Watch Free Course Preview",
+        secondaryCtaText: "Explore Learning Paths",
+        videoPreviewUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        heroImageUrl: "/images/young-muslim-student-dashboard.webp",
+        quoteBadgeText: "Read. Learn. Understand. Live.",
+        captionTitle: "Empowering Homes With Sacred Knowledge",
+        stats: [
+          { label: "Teaching Experience", value: "10+ Years", subtext: "Certified Ustadhs" },
+          { label: "Certified Teachers", value: "Qualified", subtext: "Ijazah Holders" },
+          { label: "Online Classes", value: "Flexible", subtext: "1-on-1 & Groups" },
+          { label: "Global Reach", value: "India, GCC, Australia", subtext: "Worldwide" },
+        ],
+      },
+    },
+    update: {},
+  });
+  console.log("✓ Created CMS Sections (learning_paths, home_hero)");
   console.log("🎉 SEED COMPLETED SUCCESSFULLY");
   console.log("==========================================");
   console.log("Development Logins:");

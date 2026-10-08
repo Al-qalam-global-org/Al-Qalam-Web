@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { GraduationCap, Globe, Share2, MessageCircle } from "lucide-react";
+import { Globe, Share2, MessageCircle } from "lucide-react";
+import { BrandLogo } from "@/components/shared/BrandLogo";
 import { APP_NAME } from "@/lib/constants";
 
 export function Footer() {
@@ -10,14 +11,7 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-5">
           {/* Col 1: Brand & Tagline */}
           <div className="md:col-span-2">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-950 text-gold-400">
-                <GraduationCap className="h-6 w-6" />
-              </div>
-              <span className="font-serif text-xl font-bold tracking-tight text-green-950">
-                Al-Qalam<span className="text-gold-500">Global</span>
-              </span>
-            </Link>
+            <BrandLogo iconHeight="h-11 sm:h-12" nameHeight="h-9 sm:h-10" />
             <p className="mt-4 max-w-sm text-sm text-charcoal-500 leading-relaxed">
               Structured online Islamic education for children, teenagers and adults — with qualified teachers, flexible learning and a clear path from knowledge to practice.
             </p>
@@ -60,30 +54,30 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Col 3: Portals */}
+          {/* Col 3: Policies & Legal */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-green-950">
-              Portals
+              Policies
             </h4>
             <ul className="mt-4 space-y-2.5 text-sm">
               <li>
-                <Link href="/login" className="hover:text-green-900 transition">
-                  Student Portal
+                <Link href="/privacy" className="hover:text-green-900 transition">
+                  Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/teacher/login" className="hover:text-green-900 transition">
-                  Teacher Portal
+                <Link href="/terms" className="hover:text-green-900 transition">
+                  Terms &amp; Conditions
                 </Link>
               </li>
               <li>
-                <Link href="/admin/login" className="hover:text-green-900 transition">
-                  Admin Control Center
+                <Link href="/privacy#safeguarding" className="hover:text-green-900 transition">
+                  Student Safeguarding
                 </Link>
               </li>
               <li>
-                <Link href="/reset-password" className="hover:text-green-900 transition">
-                  Account Recovery
+                <Link href="/terms#refund" className="hover:text-green-900 transition">
+                  Refund &amp; Cancellation
                 </Link>
               </li>
             </ul>
@@ -130,16 +124,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between border-t border-charcoal-200 pt-8 sm:flex-row text-xs text-charcoal-500">
+        {/* Bottom Bar: Copyright Only & Centered */}
+        <div className="mt-12 border-t border-charcoal-200 pt-8 text-center text-xs text-charcoal-500">
           <p>© {new Date().getFullYear()} {APP_NAME}. All rights reserved.</p>
-          <div className="mt-4 flex gap-6 sm:mt-0">
-            <Link href="/about" className="hover:text-green-900 transition">
-              Privacy Policy
-            </Link>
-            <Link href="/about" className="hover:text-green-900 transition">
-              Terms &amp; Conditions
-            </Link>
-          </div>
         </div>
       </div>
     </footer>

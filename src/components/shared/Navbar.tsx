@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Menu, X, GraduationCap } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { BrandLogo } from "@/components/shared/BrandLogo";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -58,21 +59,9 @@ export function Navbar() {
 
       {/* Main Navigation Bar */}
       <div className="border-b border-charcoal-200/80 bg-white/95 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-950 text-gold-400 shadow-sm">
-              <GraduationCap className="h-6 w-6" />
-            </div>
-            <div>
-              <span className="font-serif text-lg font-bold tracking-tight text-green-950">
-                Al-Qalam<span className="text-gold-500">Global</span>
-              </span>
-              <p className="text-[10px] uppercase tracking-widest text-charcoal-500">
-                Online Islamic Education Platform
-              </p>
-            </div>
-          </Link>
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+          {/* Brand Logo: Icon Left + Name Right */}
+          <BrandLogo />
 
           {/* Desktop Navigation Links (Clean page routes, removed FAQ and Teachers as requested) */}
           <nav className="hidden items-center gap-8 md:flex">

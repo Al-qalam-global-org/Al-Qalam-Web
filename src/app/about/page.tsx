@@ -78,19 +78,16 @@ export default function AboutPage() {
       name: "Sheikh Dr. Tariq Al-Hashimi",
       role: "Founder & Academic Director",
       bio: "Ph.D. in Usul al-Din from Al-Azhar University, holding 10 Qira'at Ijazah with 22 years of teaching across Australia and the Middle East.",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80",
     },
     {
       name: "Ustadha Fatima Al-Zahra",
       role: "Head of Women and Children Programs",
       bio: "Master's in Islamic Education, Hafidha of the Quran with Sanad linked to the Prophet (ﷺ), specializing in child psychology and pedagogy.",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80",
     },
     {
       name: "Ustadh Ibrahim Mansoor",
       role: "Head of Youth and Teen Leadership",
       bio: "Graduate of Islamic University of Madinah (Faculty of Hadith), youth mentor with extensive community leadership experience in the UK & GCC.",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80",
     },
   ];
 
@@ -144,8 +141,8 @@ export default function AboutPage() {
             <div className="lg:col-span-6 relative">
               <div className="relative mx-auto max-w-md lg:max-w-none overflow-hidden rounded-3xl border border-charcoal-200 bg-white p-3 shadow-card">
                 <img
-                  src="https://images.unsplash.com/photo-1542816417-0983c9c9ad53?w=1000&auto=format&fit=crop&q=80"
-                  alt="Islamic calligraphy and study"
+                  src="/images/young-muslim-student-dashboard.webp"
+                  alt="Young Muslim Student's Learning Portal - Al-Qalam Global Academy"
                   className="rounded-2xl object-cover h-[440px] w-full"
                 />
                 <div className="absolute bottom-6 left-6 right-6 rounded-2xl bg-green-950/90 p-5 text-ivory-50 backdrop-blur-md border border-green-800">
@@ -249,12 +246,8 @@ export default function AboutPage() {
                 key={leader.name}
                 className="rounded-3xl border border-charcoal-200 bg-ivory-50/50 p-6 text-center hover:shadow-card transition"
               >
-                <div className="mx-auto h-32 w-32 overflow-hidden rounded-full border-4 border-white shadow-md mb-4">
-                  <img
-                    src={leader.image}
-                    alt={leader.name}
-                    className="h-full w-full object-cover"
-                  />
+                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-green-950 font-serif text-2xl font-bold text-gold-400 border-2 border-gold-500/40 shadow-md mb-4">
+                  {leader.name.charAt(0)}
                 </div>
                 <h3 className="font-serif text-lg font-bold text-green-950">
                   {leader.name}

@@ -56,8 +56,7 @@ export default function AdminCmsPage() {
     primaryCtaText: "Watch Free Course Preview",
     secondaryCtaText: "Explore Learning Paths",
     videoPreviewUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    heroImageUrl:
-      "https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&auto=format&fit=crop&q=80",
+    heroImageUrl: "",
     quoteBadgeText: "Read. Learn. Understand. Live.",
     captionTitle: "Empowering Homes With Sacred Knowledge",
     stats: [

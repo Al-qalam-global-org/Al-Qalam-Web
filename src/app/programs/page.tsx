@@ -15,6 +15,7 @@ import {
   Sparkles,
   Calendar,
   HeartHandshake,
+  Compass,
 } from "lucide-react";
 
 export const metadata = {
@@ -30,7 +31,7 @@ export default function ProgramsPage() {
       title: "Children's Islamic Foundation Program",
       target: "Grades 1 – 12 (Ages 6 – 14)",
       tagline: "Cultivating love for Allah, the Qur'an, and good character in young hearts.",
-      image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=800&auto=format&fit=crop&q=80",
+      icon: GraduationCap,
       features: [
         "Noorani Qaida & step-by-step Quranic reading fluency",
         "Essential daily Duas, Kalimahs, and Salah (Prayer) practical training",
@@ -51,7 +52,7 @@ export default function ProgramsPage() {
       title: "Teen Identity and Islamic Leadership Program",
       target: "Teens (Ages 13 – 19)",
       tagline: "Empowering youth with authentic knowledge and confident identity in the modern world.",
-      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&auto=format&fit=crop&q=80",
+      icon: Compass,
       features: [
         "Intermediate & Advanced Tajweed rules with theoretical understanding",
         "Understanding contemporary ethical dilemmas and Islamic worldview",
@@ -72,7 +73,7 @@ export default function ProgramsPage() {
       title: "Adults and Professionals Evening and Weekend Track",
       target: "Working Professionals and University Students",
       tagline: "Flexible, structured Islamic learning tailored for busy professional and family life.",
-      image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80",
+      icon: Clock,
       features: [
         "Personalized 1-on-1 pacing matching your work hours and time zone",
         "Tafseer of key Surahs (Surah Al-Kahf, Surah Al-Mulk, Surah Yasin)",
@@ -93,7 +94,7 @@ export default function ProgramsPage() {
       title: "Lifelong Learners and Quran Mastery Program",
       target: "Adults, Seniors and Lifelong Seekers",
       tagline: "It is never too late to learn. Reconnect with the words of Allah at your own peaceful pace.",
-      image: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&auto=format&fit=crop&q=80",
+      icon: BookOpen,
       features: [
         "Patient, supportive teachers dedicated to adult beginners",
         "Slow-paced, thorough pronunciation correction without pressure",
@@ -140,16 +141,22 @@ export default function ProgramsPage() {
             >
               {/* Image & Quick Info */}
               <div className="lg:col-span-5 space-y-4">
-                <div className="relative h-72 sm:h-80 overflow-hidden rounded-2xl">
-                  <img
-                    src={prog.image}
-                    alt={prog.title}
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute top-3 left-3">
-                    <span className="rounded-lg bg-green-950/90 px-3 py-1 text-xs font-semibold text-gold-400 backdrop-blur-xs">
+                <div className="relative h-72 sm:h-80 overflow-hidden rounded-2xl bg-gradient-to-br from-green-950 via-green-900 to-charcoal-900 p-8 flex flex-col justify-between text-white">
+                  <div className="flex items-center justify-between">
+                    <span className="rounded-lg bg-gold-500/20 px-3 py-1 text-xs font-semibold text-gold-400 border border-gold-400/30">
                       {prog.target}
                     </span>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-gold-400 shadow-inner">
+                      <prog.icon className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-mono tracking-wider text-gold-400/80 uppercase">
+                      Curriculum Track
+                    </span>
+                    <h3 className="font-serif text-2xl font-bold text-white mt-1">
+                      {prog.title}
+                    </h3>
                   </div>
                 </div>
 
