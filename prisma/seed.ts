@@ -10,14 +10,21 @@ const connectionString =
   process.env.DATABASE_URL ||
   "postgresql://postgres:postgres@localhost:5432/alqalam_db?schema=public";
 
-const pool = new Pool({ connectionString });
+const isLocal = connectionString.includes("localhost") || connectionString.includes("127.0.0.1");
+
+const pool = new Pool({
+  connectionString,
+  ssl: isLocal ? undefined : { rejectUnauthorized: false },
+});
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("🌱 Starting Al-Qalam Global Academy database seed...");
 
-  // Clean existing tables (safe reset for dev)
+  // Clean existing tables (safe reset)
+  await prisma.testimonial.deleteMany().catch(() => {});
+  await prisma.cmsSection.deleteMany().catch(() => {});
   await prisma.auditLog.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.certificate.deleteMany();

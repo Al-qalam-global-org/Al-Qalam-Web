@@ -10,12 +10,15 @@ const globalForPrisma = globalThis as unknown as {
 
 function createPrismaClient(): PrismaClient {
   const connectionString = env.DATABASE_URL;
+  const isLocal = connectionString.includes("localhost") || connectionString.includes("127.0.0.1");
+
   const pool =
     globalForPrisma.pgPool ||
     new Pool({
       connectionString,
       max: 10,
       idleTimeoutMillis: 30000,
+      ssl: isLocal ? undefined : { rejectUnauthorized: false },
     });
 
   if (process.env.NODE_ENV !== "production") {
