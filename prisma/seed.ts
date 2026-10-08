@@ -1,0 +1,521 @@
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
+import { hashPassword } from "../src/lib/auth/password";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const connectionString =
+  process.env.DATABASE_URL ||
+  "postgresql://postgres:postgres@localhost:5432/alqalam_db?schema=public";
+
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
+
+async function main() {
+  console.log("🌱 Starting Al-Qalam Global Academy database seed...");
+
+  // Clean existing tables (safe reset for dev)
+  await prisma.auditLog.deleteMany();
+  await prisma.notification.deleteMany();
+  await prisma.certificate.deleteMany();
+  await prisma.assessmentResult.deleteMany();
+  await prisma.assessment.deleteMany();
+  await prisma.assignmentSubmission.deleteMany();
+  await prisma.assignment.deleteMany();
+  await prisma.courseMaterial.deleteMany();
+  await prisma.studentProgress.deleteMany();
+  await prisma.teacherNote.deleteMany();
+  await prisma.topicCovered.deleteMany();
+  await prisma.attendance.deleteMany();
+  await prisma.classStudent.deleteMany();
+  await prisma.class.deleteMany();
+  await prisma.teacherStudentAssignment.deleteMany();
+  await prisma.studentCourse.deleteMany();
+  await prisma.course.deleteMany();
+  await prisma.student.deleteMany();
+  await prisma.teacher.deleteMany();
+  await prisma.session.deleteMany();
+  await prisma.passwordResetToken.deleteMany();
+  await prisma.user.deleteMany();
+
+  // 1. ADMIN USER
+  const adminPassword = await hashPassword("AdminPass123!");
+  const admin = await prisma.user.create({
+    data: {
+      email: "admin@alqalamglobal.com",
+      passwordHash: adminPassword,
+      role: "ADMIN",
+      status: "ACTIVE",
+    },
+  });
+  console.log("✓ Created Admin: admin@alqalamglobal.com (Password: AdminPass123!)");
+
+  // 2. TEACHERS
+  const teacherPassword = await hashPassword("TeacherPass123!");
+
+  const teacher1User = await prisma.user.create({
+    data: {
+      email: "ustadh.ahmed@alqalamglobal.com",
+      passwordHash: teacherPassword,
+      role: "TEACHER",
+      status: "ACTIVE",
+    },
+  });
+
+  const teacher1 = await prisma.teacher.create({
+    data: {
+      userId: teacher1User.id,
+      firstName: "Ahmed",
+      lastName: "Al-Misri",
+      phone: "+971501234567",
+      country: "UAE",
+      timezone: "Asia/Dubai",
+      qualification: "Ijazah in Ten Qira'at, Al-Azhar University Graduate",
+      experienceYears: 12,
+      specialization: "Qur'an & Tajweed, Tafseer",
+      bio: "Over 12 years of experience teaching Qur'an recitation with authentic Tajweed rules across communities in Australia and the UAE.",
+      status: "ACTIVE",
+    },
+  });
+
+  const teacher2User = await prisma.user.create({
+    data: {
+      email: "ustadh.faisal@alqalamglobal.com",
+      passwordHash: teacherPassword,
+      role: "TEACHER",
+      status: "ACTIVE",
+    },
+  });
+
+  const teacher2 = await prisma.teacher.create({
+    data: {
+      userId: teacher2User.id,
+      firstName: "Faisal",
+      lastName: "Rahman",
+      phone: "+61412345678",
+      country: "Australia",
+      timezone: "Australia/Sydney",
+      qualification: "MA in Islamic Studies, Madinah Islamic University",
+      experienceYears: 10,
+      specialization: "Tafseer & Hadith, Fiqh",
+      bio: "Dedicated scholar focusing on contextual Islamic jurisprudence and Prophetic traditions for modern youth and families.",
+      status: "ACTIVE",
+    },
+  });
+  console.log("✓ Created 2 Teachers (Password: TeacherPass123!)");
+
+  // 3. COURSES
+  const coursesData = [
+    {
+      name: "Online Madrassa (Grades 1–12)",
+      slug: "online-madrassa",
+      description:
+        "Complete structured Islamic education programme for children and youth covering Aqeedah, Fiqh, Seerah, and Islamic manners.",
+      category: "Foundation",
+      ageGroup: "Children (Grades 1-12)",
+      level: "All Levels",
+      duration: "1 Year / Multi-term",
+    },
+    {
+      name: "Qur'an Reading & Recitation",
+      slug: "quran-reading-recitation",
+      description:
+        "Build a strong foundation in Noorani Qaida, Tajweed rules, and fluent Qur'anic recitation under certified Ijazah holders.",
+      category: "Qur'an Studies",
+      ageGroup: "All Ages",
+      level: "Beginner to Advanced",
+      duration: "6 Months",
+    },
+    {
+      name: "Tafseer: Understanding the Qur'an",
+      slug: "tafseer-understanding-quran",
+      description:
+        "Discover the meanings, historical contexts, and practical life guidance from the holy verses of the Qur'an.",
+      category: "Qur'an Studies",
+      ageGroup: "Teens & Adults",
+      level: "Intermediate",
+      duration: "4 Months",
+    },
+    {
+      name: "Hadith: Prophetic Guidance",
+      slug: "hadith-prophetic-guidance",
+      description:
+        "Learn from the profound teachings, actions, and traditions of Prophet Muhammad (ﷺ) to enrich daily character.",
+      category: "Prophetic Traditions",
+      ageGroup: "Teens & Adults",
+      level: "Intermediate",
+      duration: "3 Months",
+    },
+    {
+      name: "Fiqh: Islamic Practice & Law",
+      slug: "fiqh-islamic-practice",
+      description:
+        "Understand essential rulings for purification, prayer, fasting, zakah, and everyday ethical financial transactions.",
+      category: "Jurisprudence",
+      ageGroup: "All Ages",
+      level: "Beginner to Intermediate",
+      duration: "4 Months",
+    },
+    {
+      name: "Akhlaq: Character & Etiquette",
+      slug: "akhlaq-character-etiquette",
+      description:
+        "Instilling Islamic morals, empathy, family values, and digital ethics in everyday contemporary living.",
+      category: "Character Building",
+      ageGroup: "Children & Teens",
+      level: "Beginner",
+      duration: "3 Months",
+    },
+    {
+      name: "Seerah: The Prophet's Life",
+      slug: "seerah-prophets-life",
+      description:
+        "An inspiring, chronological study of the life, leadership, and compassion of the Messenger of Allah (ﷺ).",
+      category: "Islamic History",
+      ageGroup: "All Ages",
+      level: "All Levels",
+      duration: "4 Months",
+    },
+    {
+      name: "Tarikh: Islamic History & Civilization",
+      slug: "tarikh-islamic-civilization",
+      description:
+        "Explore the Golden Age of Islam, the Rightly Guided Caliphs, and scientific contributions to human civilization.",
+      category: "Islamic History",
+      ageGroup: "Teens & Adults",
+      level: "Intermediate",
+      duration: "3 Months",
+    },
+  ];
+
+  const createdCourses = [];
+  for (const c of coursesData) {
+    const course = await prisma.course.create({ data: c });
+    createdCourses.push(course);
+  }
+  console.log(`✓ Created ${createdCourses.length} Courses`);
+
+  // 4. STUDENTS
+  const studentPassword = await hashPassword("StudentPass123!");
+  const studentsRaw = [
+    {
+      email: "ahmed.ali@example.com",
+      firstName: "Ahmed",
+      lastName: "Ali",
+      phone: "+971520112233",
+      country: "UAE",
+      grade: "Grade 6",
+      level: "Intermediate",
+      parentName: "Ali Al-Maktoum",
+      parentPhone: "+971520112200",
+      parentEmail: "parent.ali@example.com",
+    },
+    {
+      email: "fatima.zahra@example.com",
+      firstName: "Fatima",
+      lastName: "Zahra",
+      phone: "+61499887766",
+      country: "Australia",
+      grade: "Grade 4",
+      level: "Beginner",
+      parentName: "Rehman K.",
+      parentPhone: "+61499887700",
+      parentEmail: "rehman.k@example.com",
+    },
+    {
+      email: "yusuf.khan@example.com",
+      firstName: "Yusuf",
+      lastName: "Khan",
+      phone: "+447123456789",
+      country: "United Kingdom",
+      grade: "Grade 9",
+      level: "Intermediate",
+      parentName: "Tariq Khan",
+      parentPhone: "+447123456700",
+      parentEmail: "tariq.khan@example.com",
+    },
+    {
+      email: "maryam.s@example.com",
+      firstName: "Maryam",
+      lastName: "Siddiqui",
+      phone: "+919876543210",
+      country: "India",
+      grade: "Adult Professional",
+      level: "Advanced",
+      parentName: "Self",
+      parentPhone: "+919876543210",
+      parentEmail: "maryam.s@example.com",
+    },
+    {
+      email: "ibrahim.r@example.com",
+      firstName: "Ibrahim",
+      lastName: "Razi",
+      phone: "+97455123456",
+      country: "Qatar",
+      grade: "Grade 7",
+      level: "Beginner",
+      parentName: "Rashid Razi",
+      parentPhone: "+97455123400",
+      parentEmail: "rashid.r@example.com",
+    },
+  ];
+
+  const createdStudents = [];
+  for (const s of studentsRaw) {
+    const u = await prisma.user.create({
+      data: {
+        email: s.email,
+        passwordHash: studentPassword,
+        role: "STUDENT",
+        status: "ACTIVE",
+      },
+    });
+
+    const st = await prisma.student.create({
+      data: {
+        userId: u.id,
+        firstName: s.firstName,
+        lastName: s.lastName,
+        phone: s.phone,
+        country: s.country,
+        grade: s.grade,
+        level: s.level,
+        parentName: s.parentName,
+        parentPhone: s.parentPhone,
+        parentEmail: s.parentEmail,
+      },
+    });
+    createdStudents.push(st);
+  }
+  console.log(`✓ Created ${createdStudents.length} Students (Password: StudentPass123!)`);
+
+  // 5. ENROLLMENTS & TEACHER ASSIGNMENTS
+  const quranCourse = createdCourses[1];
+  const madrassaCourse = createdCourses[0];
+  const tafseerCourse = createdCourses[2];
+
+  for (const st of createdStudents) {
+    // Enroll in Quran course
+    await prisma.studentCourse.create({
+      data: {
+        studentId: st.id,
+        courseId: quranCourse.id,
+        currentProgress: 65,
+        currentLevel: "Intermediate",
+      },
+    });
+
+    await prisma.teacherStudentAssignment.create({
+      data: {
+        teacherId: teacher1.id,
+        studentId: st.id,
+        courseId: quranCourse.id,
+      },
+    });
+
+    // Create progress record
+    await prisma.studentProgress.create({
+      data: {
+        studentId: st.id,
+        courseId: quranCourse.id,
+        progressPercentage: 68,
+        currentLevel: "Intermediate",
+        completedTopics: 14,
+        totalTopics: 20,
+        updatedBy: teacher1.firstName,
+      },
+    });
+  }
+
+  // Also enroll Ahmed & Fatima in Tafseer with Teacher 2
+  await prisma.studentCourse.create({
+    data: {
+      studentId: createdStudents[0].id,
+      courseId: tafseerCourse.id,
+      currentProgress: 40,
+    },
+  });
+  await prisma.teacherStudentAssignment.create({
+    data: {
+      teacherId: teacher2.id,
+      studentId: createdStudents[0].id,
+      courseId: tafseerCourse.id,
+    },
+  });
+
+  // 6. SAMPLE CLASSES
+  const today = new Date();
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  const class1 = await prisma.class.create({
+    data: {
+      courseId: quranCourse.id,
+      teacherId: teacher1.id,
+      scheduledDate: today,
+      startTime: "17:00",
+      endTime: "18:00",
+      timezone: "Asia/Dubai",
+      classType: "ONE_TO_ONE",
+      meetingPlatform: "ZOOM",
+      meetingUrl: "https://zoom.us/j/9876543210?pwd=alqalamdemo",
+      status: "SCHEDULED",
+      students: {
+        create: [{ studentId: createdStudents[0].id }],
+      },
+    },
+  });
+
+  const class2 = await prisma.class.create({
+    data: {
+      courseId: tafseerCourse.id,
+      teacherId: teacher2.id,
+      scheduledDate: tomorrow,
+      startTime: "18:30",
+      endTime: "19:30",
+      timezone: "Asia/Dubai",
+      classType: "GROUP",
+      meetingPlatform: "GOOGLE_MEET",
+      meetingUrl: "https://meet.google.com/abc-defg-hij",
+      status: "SCHEDULED",
+      students: {
+        create: [
+          { studentId: createdStudents[0].id },
+          { studentId: createdStudents[1].id },
+          { studentId: createdStudents[2].id },
+        ],
+      },
+    },
+  });
+  console.log("✓ Created scheduled classes with Zoom & Meet links");
+
+  // 7. ATTENDANCE & TOPIC & NOTES
+  await prisma.attendance.create({
+    data: {
+      classId: class1.id,
+      studentId: createdStudents[0].id,
+      status: "PRESENT",
+      markedBy: "Ustadh Ahmed",
+      note: "Participated enthusiastically with clear Makhaarij.",
+    },
+  });
+
+  await prisma.topicCovered.create({
+    data: {
+      classId: class1.id,
+      studentId: createdStudents[0].id,
+      title: "Surah Al-Baqarah — Ayah 1 to 10",
+      description: "Reviewed rules of Madd and Idgham with Ghunnah.",
+      createdBy: "Ustadh Ahmed",
+    },
+  });
+
+  await prisma.teacherNote.create({
+    data: {
+      studentId: createdStudents[0].id,
+      teacherId: teacher1.id,
+      classId: class1.id,
+      note: "Ahmed is improving his pronunciation and reading fluency with steady Tajweed application.",
+      visibility: "STUDENT_VISIBLE",
+    },
+  });
+
+  // 8. MATERIALS
+  await prisma.courseMaterial.create({
+    data: {
+      courseId: quranCourse.id,
+      title: "Tajweed Rules Reference Chart",
+      description: "Quick guide to rules of Noon Sakinah, Meem Sakinah, and Madd.",
+      type: "PDF",
+      fileUrl: "https://example.com/materials/tajweed-chart.pdf",
+    },
+  });
+
+  // 9. ASSIGNMENTS & SUBMISSION
+  const assignment1 = await prisma.assignment.create({
+    data: {
+      courseId: quranCourse.id,
+      teacherId: teacher1.id,
+      title: "Surah Al-Mulk: Verses 1–5 Recitation Practice",
+      description: "Record audio or prepare oral recitation focusing on Ghunnah rules.",
+      dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  await prisma.assignmentSubmission.create({
+    data: {
+      assignmentId: assignment1.id,
+      studentId: createdStudents[0].id,
+      submissionText: "Recitation practice completed with Ustadh notes reviewed.",
+      status: "REVIEWED",
+      teacherFeedback: "MashaAllah, great attention to the Noon Sakinah rules!",
+      reviewedAt: new Date(),
+    },
+  });
+
+  // 10. ASSESSMENTS & RESULTS
+  const assessment1 = await prisma.assessment.create({
+    data: {
+      courseId: quranCourse.id,
+      teacherId: teacher1.id,
+      title: "Mid-Term Tajweed & Reading Evaluation",
+      description: "Oral examination of Surah Al-Fajr and theoretical Tajweed questions.",
+      totalMarks: 100,
+    },
+  });
+
+  await prisma.assessmentResult.create({
+    data: {
+      assessmentId: assessment1.id,
+      studentId: createdStudents[0].id,
+      obtainedMarks: 94,
+      remarks: "Excellent fluency and articulation. Keep up the high standard!",
+      gradedBy: "Ustadh Ahmed",
+    },
+  });
+
+  // 11. CERTIFICATES
+  await prisma.certificate.create({
+    data: {
+      studentId: createdStudents[3].id, // Maryam Siddiqui
+      courseId: quranCourse.id,
+      certificateNumber: "AQG-2026-QRN01",
+      completionDate: new Date(),
+      issuedBy: "Al-Qalam Global Academy",
+    },
+  });
+  console.log("✓ Created sample certificate (AQG-2026-QRN01)");
+
+  // 12. NOTIFICATIONS
+  await prisma.notification.create({
+    data: {
+      userId: createdStudents[0].userId,
+      title: "Class Scheduled",
+      message: `Your class for ${quranCourse.name} is scheduled for today at 17:00.`,
+      type: "CLASS_SCHEDULED",
+    },
+  });
+
+  console.log("\n==========================================");
+  console.log("🎉 SEED COMPLETED SUCCESSFULLY");
+  console.log("==========================================");
+  console.log("Development Logins:");
+  console.log("👑 ADMIN:   admin@alqalamglobal.com / AdminPass123!");
+  console.log("👨‍🏫 TEACHER: ustadh.ahmed@alqalamglobal.com / TeacherPass123!");
+  console.log("👨‍🏫 TEACHER: ustadh.faisal@alqalamglobal.com / TeacherPass123!");
+  console.log("🎓 STUDENT: ahmed.ali@example.com / StudentPass123!");
+  console.log("🎓 STUDENT: fatima.zahra@example.com / StudentPass123!");
+  console.log("==========================================\n");
+}
+
+main()
+  .catch((e) => {
+    console.error("Error during seed:", e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+    await pool.end();
+  });
